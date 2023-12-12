@@ -17,6 +17,7 @@ OPTION(MAKE_COLLISION "Make Collision application" ON)
 OPTION(MAKE_DEBUGDRAW "Make DebugDraw application" ON)
 OPTION(MAKE_RAYCAST "Make Raycast application" ON)
 OPTION(MAKE_MATRIXPIXEL "Make MatrixPixel application" ON)
+OPTION(MAKE_TOWERGUARDIAN "Make TowerGuardian start application" ON)
 
 OPTION(USE_RS232 "Use RS232 library" OFF)
 OPTION(MAKE_SERIAL "Make serial application" OFF)
@@ -221,7 +222,33 @@ IF(MAKE_DEMO)
 		DESTINATION ${CMAKE_BINARY_DIR}
 	)
 ENDIF()
+####################################################################
+#TOWERGUARDIAN#
+####################################################################
+IF(MAKE_TOWERGUARDIAN)
+    add_executable(TowerGuardian
+        TowerGuardian/main.cpp
+		TowerGuardian/myscene.cpp
+		TowerGuardian/myscene.h
+		TowerGuardian/tower.cpp
+		TowerGuardian/tower.h
+		TowerGuardian/enemy.cpp
+		TowerGuardian/enemy.h
+		TowerGuardian/cell.cpp
+		TowerGuardian/cell.h
+		TowerGuardian/player.cpp
+		TowerGuardian/player.h
+        )
 
+    target_link_libraries(TowerGuardian
+        ${ALL_GRAPHICS_LIBS}
+    )
+    # Copy assets to the build directory
+    file(
+        COPY TowerGuardian/assets
+        DESTINATION ${CMAKE_BINARY_DIR}
+    )
+ENDIF()
 
 ####################################################################
 # canvasdemo                                                       #
