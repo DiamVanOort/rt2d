@@ -1,4 +1,6 @@
 #include "myscene.h"
+#include "enemy.h"
+#include "tower.h"
 #include <cstdlib>
 #include <ctime>
 
@@ -7,6 +9,9 @@ MyScene::MyScene()
     grid = std::vector<Cell*>();
     //Makes list for the path cells
     pathList = std::vector<size_t>();
+
+
+    
 
     //Makes grid
     for (size_t y = 0; y < 11; y++)
@@ -33,6 +38,10 @@ MyScene::MyScene()
         // Adds path cells to list
         pathList.push_back(cellIndex);
     }
+
+
+
+    SpawnNewEnemy();
 }
 
 MyScene::~MyScene()
@@ -42,5 +51,78 @@ MyScene::~MyScene()
 
 void MyScene::update(float deltaTime)
 {
-    
+    // for (auto it = enemyList.begin(); it != enemyList.end(); ++it)
+    // {
+    //     std::cout << (*it)->position << std::endl;
+    // }
+
+
+    DeleteEnemy();
+
+    if (input()->getMouseDown(0))
+    {
+        // Getting mouse position and converting into grid coordinates
+        int mouseX = input()->getMouseX();
+        int mouseY = input()->getMouseY();
+
+        int gridX = (mouseX - 40 + 32) / 64;
+        int gridY = (mouseY - 40 + 32) / 64;
+
+        // Making sure coordinates are on the grid
+        if (gridX >= 0 && gridX < 20 && gridY >= 0 && gridY < 20)
+        {
+            // Get the clicked cell
+            Cell *clickedCell = grid[gridY * 20 + gridX];
+
+            // Change the color to blue
+            SpawnTower(clickedCell);
+        }
+    }
+}
+
+
+
+
+
+void MyScene::DeleteEnemy()
+{
+    if (!enemyList.empty())
+    {
+        Enemy* frontEnemy = enemyList.front();
+        if (frontEnemy->position.x >= grid[pathList[19]]->position.x + 64)
+        {
+            enemyList.pop_front();
+            this->removeChild(frontEnemy);  // Remove from the scene
+            delete frontEnemy;
+
+            numberOfEnemiesToSpawn = 1;
+            SpawnNewEnemy();
+        }
+    }
+}
+
+
+void MyScene::SpawnNewEnemy()
+{
+
+    for (int i = 0; i < numberOfEnemiesToSpawn; ++i)
+    {
+        // Spawn a new enemy at the starting position
+        Enemy* newEnemy = new Enemy();
+        newEnemy->position = grid[pathList[0]]->position;
+        newEnemy->position.x = newEnemy->position.x - 66 * i; // Adjust the position for each enemy
+        this->addChild(newEnemy);
+        enemyList.push_back(newEnemy);
+    }
+}
+
+void MyScene::SpawnTower(Cell* cell)
+{
+    // Check if the cell is not a path cell
+    if (!cell->isPath)
+    {
+        Tower* tower = new Tower();
+        tower->position = cell->position;
+        this->addChild(tower);
+    }
 }
